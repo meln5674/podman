@@ -74,10 +74,8 @@ type PodmanTestIntegration struct {
 	TmpDir              string
 }
 
-var (
-	GlobalTmpDir string // Single top-level tmpdir for all tests
-	LockTmpDir   string
-)
+var GlobalTmpDir string // Single top-level tmpdir for all tests
+var LockTmpDir string
 
 // PodmanSessionIntegration struct for command line session
 type PodmanSessionIntegration struct {
@@ -796,7 +794,7 @@ func (p *PodmanTestIntegration) RunTopContainer(name string) *PodmanSessionInteg
 // runs top.  If the name passed != "", it will have a name, command args can also be passed in
 func (p *PodmanTestIntegration) RunTopContainerWithArgs(name string, args []string) *PodmanSessionIntegration {
 	// In proxy environment, some tests need to the --http-proxy=false option (#16684)
-	podmanArgs := []string{"run", "--http-proxy=false"}
+	var podmanArgs = []string{"run", "--http-proxy=false"}
 	if name != "" {
 		podmanArgs = append(podmanArgs, "--name", name)
 	}
@@ -815,7 +813,7 @@ func (p *PodmanTestIntegration) RunTopContainerWithArgs(name string, args []stri
 // RunLsContainer runs a simple container in the background that
 // simply runs ls. If the name passed != "", it will have a name
 func (p *PodmanTestIntegration) RunLsContainer(name string) (*PodmanSessionIntegration, int, string) {
-	podmanArgs := []string{"run"}
+	var podmanArgs = []string{"run"}
 	if name != "" {
 		podmanArgs = append(podmanArgs, "--name", name)
 	}
@@ -834,7 +832,7 @@ func (p *PodmanTestIntegration) RunLsContainer(name string) (*PodmanSessionInteg
 
 // RunNginxWithHealthCheck runs the alpine nginx container with an optional name and adds a healthcheck into it
 func (p *PodmanTestIntegration) RunNginxWithHealthCheck(name string) (*PodmanSessionIntegration, string) {
-	podmanArgs := []string{"run"}
+	var podmanArgs = []string{"run"}
 	if name != "" {
 		podmanArgs = append(podmanArgs, "--name", name)
 	}
@@ -847,7 +845,7 @@ func (p *PodmanTestIntegration) RunNginxWithHealthCheck(name string) (*PodmanSes
 
 // RunContainerWithNetworkTest runs the fedoraMinimal curl with the specified network mode.
 func (p *PodmanTestIntegration) RunContainerWithNetworkTest(mode string) *PodmanSessionIntegration {
-	podmanArgs := []string{"run"}
+	var podmanArgs = []string{"run"}
 	if mode != "" {
 		podmanArgs = append(podmanArgs, "--network", mode)
 	}
@@ -857,7 +855,7 @@ func (p *PodmanTestIntegration) RunContainerWithNetworkTest(mode string) *Podman
 }
 
 func (p *PodmanTestIntegration) RunLsContainerInPod(name, pod string) (*PodmanSessionIntegration, int, string) {
-	podmanArgs := []string{"run", "--pod", pod}
+	var podmanArgs = []string{"run", "--pod", pod}
 	if name != "" {
 		podmanArgs = append(podmanArgs, "--name", name)
 	}
@@ -966,7 +964,7 @@ func checkStderrCleanupError(s *PodmanSessionIntegration, cmd string) {
 		return
 	}
 	// offset is 1 so the stacj trace doesn't link to this helper function here
-	// ExpectWithOffset(1, s.ErrorToString()).To(BeEmpty(), cmd)
+	ExpectWithOffset(1, s.ErrorToString()).To(BeEmpty(), cmd)
 }
 
 // CleanupVolume cleans up the volumes and containers.
@@ -1018,7 +1016,7 @@ func (s *PodmanSessionIntegration) InspectPodArrToJSON() []define.InspectPodData
 // CreatePod creates a pod with no infra container
 // it optionally takes a pod name
 func (p *PodmanTestIntegration) CreatePod(options map[string][]string) (*PodmanSessionIntegration, int, string) {
-	args := []string{"pod", "create", "--infra=false", "--share", ""}
+	var args = []string{"pod", "create", "--infra=false", "--share", ""}
 	for k, values := range options {
 		for _, v := range values {
 			args = append(args, k+"="+v)
@@ -1031,7 +1029,7 @@ func (p *PodmanTestIntegration) CreatePod(options map[string][]string) (*PodmanS
 }
 
 func (p *PodmanTestIntegration) CreateVolume(options map[string][]string) (*PodmanSessionIntegration, int, string) {
-	args := []string{"volume", "create"}
+	var args = []string{"volume", "create"}
 	for k, values := range options {
 		for _, v := range values {
 			args = append(args, k+"="+v)

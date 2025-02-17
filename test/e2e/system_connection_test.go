@@ -50,8 +50,7 @@ var _ = Describe("podman system connection", func() {
 
 	Context("without running API service", func() {
 		It("add ssh://", func() {
-			cmd := []string{
-				"system", "connection", "add",
+			cmd := []string{"system", "connection", "add",
 				"--default",
 				"--identity", "~/.ssh/id_rsa",
 				"QA",
@@ -67,8 +66,7 @@ var _ = Describe("podman system connection", func() {
 			Expect(session).Should(ExitCleanly())
 			Expect(session.OutputToString()).To(Equal("QA ssh://root@podman.test:2222/run/podman/podman.sock ~/.ssh/id_rsa true true"))
 
-			cmd = []string{
-				"system", "connection", "rename",
+			cmd = []string{"system", "connection", "rename",
 				"QA",
 				"QE",
 			}
@@ -83,8 +81,7 @@ var _ = Describe("podman system connection", func() {
 		})
 
 		It("add UDS", func() {
-			cmd := []string{
-				"system", "connection", "add",
+			cmd := []string{"system", "connection", "add",
 				"QA-UDS",
 				"unix:///run/podman/podman.sock",
 			}
@@ -100,8 +97,7 @@ var _ = Describe("podman system connection", func() {
 			Expect(session).Should(ExitCleanly())
 			Expect(session.OutputToString()).To(Equal("QA-UDS unix:///run/podman/podman.sock true true"))
 
-			cmd = []string{
-				"system", "connection", "add",
+			cmd = []string{"system", "connection", "add",
 				"QA-UDS1",
 				"--socket-path", "/run/user/podman/podman.sock",
 				"unix:///run/podman/podman.sock",
@@ -120,8 +116,7 @@ QA-UDS1 unix:///run/user/podman/podman.sock  false true
 		})
 
 		It("add tcp", func() {
-			cmd := []string{
-				"system", "connection", "add",
+			cmd := []string{"system", "connection", "add",
 				"QA-TCP",
 				"tcp://localhost:8888",
 			}
@@ -137,8 +132,7 @@ QA-UDS1 unix:///run/user/podman/podman.sock  false true
 		})
 
 		It("add tcp w/ TLS", func() {
-			cmd := []string{
-				"system", "connection", "add",
+			cmd := []string{"system", "connection", "add",
 				"QA-TCP-TLS",
 				"tcp://localhost:8888",
 				"--tls-ca", "ca.pem",
@@ -155,8 +149,7 @@ QA-UDS1 unix:///run/user/podman/podman.sock  false true
 		})
 
 		It("add tcp w/ mTLS", func() {
-			cmd := []string{
-				"system", "connection", "add",
+			cmd := []string{"system", "connection", "add",
 				"QA-TCP-MTLS",
 				"tcp://localhost:8888",
 				"--tls-ca", "ca.pem",
@@ -175,8 +168,7 @@ QA-UDS1 unix:///run/user/podman/podman.sock  false true
 		})
 
 		It("add tcp to reverse proxy path", func() {
-			cmd := []string{
-				"system", "connection", "add",
+			cmd := []string{"system", "connection", "add",
 				"QA-TCP-RP",
 				"tcp://localhost:8888/reverse/proxy/path/prefix",
 			}
@@ -192,8 +184,7 @@ QA-UDS1 unix:///run/user/podman/podman.sock  false true
 		})
 
 		It("add to new farm", func() {
-			cmd := []string{
-				"system", "connection", "add",
+			cmd := []string{"system", "connection", "add",
 				"--default",
 				"--identity", "~/.ssh/id_rsa",
 				"--farm", "farm1",
@@ -223,8 +214,7 @@ QA-UDS1 unix:///run/user/podman/podman.sock  false true
 			Expect(session).Should(ExitCleanly())
 			Expect(session.Out.Contents()).Should(ContainSubstring("Farm \"empty-farm\" created"))
 
-			cmd = []string{
-				"system", "connection", "add",
+			cmd = []string{"system", "connection", "add",
 				"--default",
 				"--identity", "~/.ssh/id_rsa",
 				"--farm", "empty-farm",
@@ -247,8 +237,7 @@ QA-UDS1 unix:///run/user/podman/podman.sock  false true
 		})
 
 		It("removing connection should remove from farm also", func() {
-			cmd := []string{
-				"system", "connection", "add",
+			cmd := []string{"system", "connection", "add",
 				"--default",
 				"--identity", "~/.ssh/id_rsa",
 				"--farm", "farm1",
@@ -286,8 +275,7 @@ QA-UDS1 unix:///run/user/podman/podman.sock  false true
 		})
 
 		It("remove", func() {
-			session := podmanTest.Podman([]string{
-				"system", "connection", "add",
+			session := podmanTest.Podman([]string{"system", "connection", "add",
 				"--default",
 				"--identity", "~/.ssh/id_rsa",
 				"QA",
@@ -311,8 +299,7 @@ QA-UDS1 unix:///run/user/podman/podman.sock  false true
 		})
 
 		It("remove --all", func() {
-			session := podmanTest.Podman([]string{
-				"system", "connection", "add",
+			session := podmanTest.Podman([]string{"system", "connection", "add",
 				"--default",
 				"--identity", "~/.ssh/id_rsa",
 				"QA",
@@ -335,8 +322,7 @@ QA-UDS1 unix:///run/user/podman/podman.sock  false true
 
 		It("default", func() {
 			for _, name := range []string{"devl", "qe"} {
-				cmd := []string{
-					"system", "connection", "add",
+				cmd := []string{"system", "connection", "add",
 					"--default",
 					"--identity", "~/.ssh/id_rsa",
 					name,
