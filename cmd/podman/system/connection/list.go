@@ -43,6 +43,7 @@ func init() {
 		cmd.Flags().StringP("format", "f", "", "Custom Go template for printing connections")
 		_ = cmd.RegisterFlagCompletionFunc("format", common.AutocompleteFormat(&config.Connection{}))
 		cmd.Flags().BoolP("quiet", "q", false, "Custom Go template for printing connections")
+		cmd.Flags().Bool("tls", false, "Include TLS info in default format. Ignored if --format is specified.")
 	}
 
 	registry.Commands = append(registry.Commands, registry.CliCommand{
@@ -73,6 +74,11 @@ func inspect(cmd *cobra.Command, args []string) error {
 	}
 
 	quiet, err := cmd.Flags().GetBool("quiet")
+	if err != nil {
+		return err
+	}
+
+	tls, err := cmd.Flags().GetBool("tls")
 	if err != nil {
 		return err
 	}
@@ -116,9 +122,12 @@ func inspect(cmd *cobra.Command, args []string) error {
 
 	if format != "" {
 		rpt, err = rpt.Parse(report.OriginUser, format)
-	} else {
+	} else if tls {
 		rpt, err = rpt.Parse(report.OriginPodman,
 			"{{range .}}{{.Name}}\t{{.URI}}\t{{.Identity}}\t{{.TLSCAFile}}\t{{.TLSCertFile}}\t{{.TLSKeyFile}}\t{{.Default}}\t{{.ReadWrite}}\n{{end -}}")
+	} else {
+		rpt, err = rpt.Parse(report.OriginPodman,
+			"{{range .}}{{.Name}}\t{{.URI}}\t{{.Identity}}\t{{.Default}}\t{{.ReadWrite}}\n{{end -}}")
 	}
 	if err != nil {
 		return err

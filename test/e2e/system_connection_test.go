@@ -350,6 +350,39 @@ qe ssh://root@podman.test:2222/run/podman/podman.sock ~/.ssh/id_rsa false true
 			session = podmanTest.Podman(cmd)
 			session.WaitWithDefaultTimeout()
 			Expect(session).Should(ExitCleanly())
+			Expect(session.Out).Should(Say("Name *URI *Identity *Default"))
+		})
+
+		It("with tls output", func() {
+			for _, name := range []string{"devl", "qe"} {
+				cmd := []string{"system", "connection", "add",
+					"--default",
+					"--identity", "~/.ssh/id_rsa",
+					name,
+					"ssh://root@podman.test:2222/run/podman/podman.sock",
+				}
+				session := podmanTest.Podman(cmd)
+				session.WaitWithDefaultTimeout()
+				Expect(session).Should(ExitCleanly())
+			}
+
+			cmd := []string{"system", "connection", "default", "devl"}
+			session := podmanTest.Podman(cmd)
+			session.WaitWithDefaultTimeout()
+			Expect(session).Should(ExitCleanly())
+			Expect(session.Out.Contents()).Should(BeEmpty())
+
+			session = podmanTest.Podman(systemConnectionListCmd)
+			session.WaitWithDefaultTimeout()
+			Expect(session).Should(ExitCleanly())
+			Expect(string(session.Out.Contents())).To(Equal(`devl ssh://root@podman.test:2222/run/podman/podman.sock ~/.ssh/id_rsa true true
+qe ssh://root@podman.test:2222/run/podman/podman.sock ~/.ssh/id_rsa false true
+`))
+
+			cmd = []string{"system", "connection", "list", "--tls"}
+			session = podmanTest.Podman(cmd)
+			session.WaitWithDefaultTimeout()
+			Expect(session).Should(ExitCleanly())
 			Expect(session.Out).Should(Say("Name *URI *Identity *TLSCAFile *TLSCertFile *TLSKeyFile *Default"))
 		})
 
