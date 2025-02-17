@@ -21,6 +21,7 @@ import (
 	"github.com/containers/common/pkg/ssh"
 	"github.com/containers/podman/v5/pkg/util/tlsutil"
 	"github.com/containers/podman/v5/version"
+	"github.com/containers/storage/pkg/fileutils"
 	"github.com/kevinburke/ssh_config"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/proxy"
@@ -227,15 +228,27 @@ func sshClient(_url *url.URL, uri string, identity string, machine bool) (Connec
 
 		if identity == "" {
 			if val := cfg.Get(alias, "IdentityFile"); val != "" {
+				// we get default IdentityFile value (~/.ssh/identity) every time
+				// checking if we got default
+				defaultIdentityPath := val == ssh_config.Default("IdentityFile")
+
 				identity = strings.Trim(val, "\"")
+
 				if strings.HasPrefix(identity, "~/") {
 					homedir, err := os.UserHomeDir()
 					if err != nil {
 						return connection, fmt.Errorf("failed to find home dir: %w", err)
 					}
+
 					identity = filepath.Join(homedir, identity[2:])
 				}
-				found = true
+
+				// if we have default value but no file exists ignoring identity
+				if err := fileutils.Exists(identity); err != nil && defaultIdentityPath {
+					identity = ""
+				} else {
+					found = true
+				}
 			}
 		}
 
